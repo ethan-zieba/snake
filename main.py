@@ -81,7 +81,6 @@ def start_menu():
         if event.type == pg.MOUSEBUTTONDOWN:
             if ((start_button_pos[0] < pg.mouse.get_pos()[0] < start_button_pos[0] + start_button.get_width())
                     and (start_button_pos[1] < pg.mouse.get_pos()[1] < start_button_pos[1] + start_button.get_height())):
-                print("Start")
                 game_state = "playing"
 
 
@@ -133,7 +132,6 @@ while running:
             snaketail[i].posx, snaketail[i].posy = previous_positions[i][0], previous_positions[i][1]
             if i != 0 and snakehead.gethead_pos() == snaketail[i].gethead_pos():
                 running = False
-        print(previous_positions)
         keys = pg.key.get_pressed()
         if keys[pg.K_DOWN] and snakehead.direction != "UP":
             snakehead.changedirection("DOWN")
