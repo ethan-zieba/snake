@@ -7,7 +7,7 @@ pygame.init()
 dimensions = (500, 500)
 screen = pg.display.set_mode(dimensions)
 FPS = 30
-snake_radius = 20
+snake_radius = 35
 running = True
 orange = (255, 128, 0)
 pink = (200, 10, 200)
@@ -16,7 +16,7 @@ game_state = "start"
 
 
 class Snake():
-    def __init__(self, radius = 20, speed = 0.7, posx = 45, posy = 45):
+    def __init__(self, radius = 32, speed = 0.7, posx = 45, posy = 45):
         self.posx = posx
         self.posy = posy
         self.direction = "RIGHT"
@@ -54,12 +54,31 @@ class Apple():
         while (self.posx, self.posy) in avoid_list:
             self.posx, self.posy = rd.randint(20, 480), rd.randint(20, 480)
 
-    def collide(self):
-        self.reset()
-
 
 def gameover():
-    pass
+    global running, game_state, snake_length, previous_positions, score, snakehead
+    snakehead = Snake()
+    snake_length = 8
+    previous_positions = []
+    score = 0
+    font = pg.font.SysFont('arial', 40)
+    screen.fill((0, 0, 0))
+    font = pg.font.SysFont('arial', 40)
+    title = font.render("c'est perdu, finito, the end", True, (255, 255, 255))
+    start_button = font.render('(re)Start', True, (0, 0, 0), (250, 250, 250))
+    screen.blit(title, (dimensions[0] / 2 - title.get_width() / 2, dimensions[1] / 2 - title.get_height() / 2))
+    start_button_pos = (dimensions[0] / 2 - start_button.get_width() / 2,
+                        dimensions[1] / 2 + start_button.get_height() / 2 + title.get_height() + 50)
+    screen.blit(start_button, (start_button_pos[0], start_button_pos[1]))
+    pg.display.update()
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if ((start_button_pos[0] < pg.mouse.get_pos()[0] < start_button_pos[0] + start_button.get_width())
+                    and (start_button_pos[1] < pg.mouse.get_pos()[1] < start_button_pos[
+                        1] + start_button.get_height())):
+                game_state = "playing"
 
 def start_menu():
     global running, game_state
@@ -131,7 +150,7 @@ while running:
             snaketail.append(Snake())
             snaketail[i].posx, snaketail[i].posy = previous_positions[i][0], previous_positions[i][1]
             if i != 0 and snakehead.gethead_pos() == snaketail[i].gethead_pos():
-                running = False
+                game_state = "over"
         keys = pg.key.get_pressed()
         if keys[pg.K_DOWN] and snakehead.direction != "UP":
             snakehead.changedirection("DOWN")
@@ -139,7 +158,7 @@ while running:
             snakehead.changedirection("UP")
         elif keys[pg.K_LEFT] and snakehead.direction != "RIGHT":
             snakehead.changedirection("LEFT")
-        elif keys[pg.K_RIGHT] and snakehead.direction != "LEFt":
+        elif keys[pg.K_RIGHT] and snakehead.direction != "LEFT":
             snakehead.changedirection("RIGHT")
         construct_background(screen)
         snakehead.move()
@@ -147,7 +166,7 @@ while running:
 
         snakehead_sprite = pg.draw.circle(surface=screen, color=orange, center=snakehead.gethead_pos(), radius=snake_radius)
         for i in range(len(snaketail)):
-            pg.draw.circle(surface=screen, color=pink, center=snaketail[i].gethead_pos(), radius=max(8, snaketail[i].radius-(i*0.06)))
+            pg.draw.circle(surface=screen, color=pink, center=snaketail[i].gethead_pos(), radius=max(15, snaketail[i].radius-(i*0.06)))
         apple_sprite = pg.image.load("textures/apple.png") if not apple.isgold else pg.image.load("textures/goldenapple.png")
         screen.blit(apple_sprite, (apple.getpos()[0]-32, apple.getpos()[1]-32))
         score_text = font.render(str(score), True, (255, 255, 255))
